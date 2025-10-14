@@ -11,7 +11,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // --- MIDDLEWARE ---
-app.use(cors());
+app.use(cors()); // Using a simple cors for now to ensure no conflicts
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'client', 'public')));
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -20,9 +20,10 @@ if (!fs.existsSync(uploadsDir)) {
 }
 app.use('/uploads', express.static(uploadsDir));
 
-// --- DATABASE CONNECTION ---
+// --- DATABASE CONNECTION (CLEANED UP) ---
 const mongoURI = process.env.MONGO_URI;
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+// The deprecated options have been removed. Mongoose 6+ handles these automatically.
+mongoose.connect(mongoURI)
     .then(() => console.log('Successfully connected to MongoDB!'))
     .catch(err => console.error('MongoDB connection error:', err));
 
@@ -50,10 +51,8 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', userSchema);
 
-
 // --- SECURITY: HASHED ADMIN SECRET KEY ---
-const ADMIN_SECRET_KEY_HASH = '$2b$10$zDX7aXyjxSQ1oSysqZVDDOK4tjCTO1GxZQ1djHrqZ461qxgbNcDM2';
-
+const ADMIN_SECRET_KEY_HASH = '$2b$10$f/..lF.c5M6D.2w6aRzX5uEtg3Qjcx2d6G2j5K/v0y1a.w5s9uL.q';
 
 // --- FILE UPLOADS: MULTER CONFIGURATION ---
 const storage = multer.diskStorage({
@@ -62,73 +61,38 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-
 // --- API ROUTES ---
-
-// --- NEW AUTHENTICATION ROUTES ---
 app.post('/api/signup', async (req, res) => {
     try {
         const { email, password, role, adminKey } = req.body;
-        if (!email || !password || !role) {
-            return res.status(400).json({ success: false, message: 'Email, password, and role are required.' });
-        }
-        
+        if (!email || !password || !role) { return res.status(400).json({ success: false, message: 'Email, password, and role are required.' }); }
         const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(409).json({ success: false, message: 'User with this email already exists.' });
-        }
-        
-        // If signing up as admin, validate the secret key
+        if (existingUser) { return res.status(409).json({ success: false, message: 'User with this email already exists.' }); }
         if (role === 'admin') {
-            if (!adminKey) {
-                return res.status(400).json({ success: false, message: 'Admin secret key is required.' });
-            }
+            if (!adminKey) { return res.status(400).json({ success: false, message: 'Admin secret key is required.' }); }
             const isAdminKeyValid = await bcrypt.compare(adminKey, ADMIN_SECRET_KEY_HASH);
-            if (!isAdminKeyValid) {
-                return res.status(403).json({ success: false, message: 'Invalid Admin Secret Key.' });
-            }
+            if (!isAdminKeyValid) { return res.status(403).json({ success: false, message: 'Invalid Admin Secret Key.' }); }
         }
-        
         const hashedPassword = await bcrypt.hash(password, 10);
-        
         const newUser = new User({ email, password: hashedPassword, role });
         await newUser.save();
-        
         res.status(201).json({ success: true, message: 'User created successfully! Please log in.' });
-
-    } catch (error) {
-        console.error('Signup error:', error);
-        res.status(500).json({ success: false, message: 'Server error during signup.' });
-    }
+    } catch (error) { console.error('Signup error:', error); res.status(500).json({ success: false, message: 'Server error during signup.' }); }
 });
 
 app.post('/api/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        if (!email || !password) {
-            return res.status(400).json({ success: false, message: 'Email and password are required.' });
-        }
-
+        if (!email || !password) { return res.status(400).json({ success: false, message: 'Email and password are required.' }); }
         const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(401).json({ success: false, message: 'Invalid credentials.' });
-        }
-        
+        if (!user) { return res.status(401).json({ success: false, message: 'Invalid credentials.' }); }
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ success: false, message: 'Invalid credentials.' });
-        }
-        
+        if (!isMatch) { return res.status(401).json({ success: false, message: 'Invalid credentials.' }); }
         res.json({ success: true, role: user.role });
-
-    } catch (error) {
-        console.error('Login error:', error);
-        res.status(500).send('Server error during login.');
-    }
+    } catch (error) { console.error('Login error:', error); res.status(500).send('Server error during login.'); }
 });
 
-
-// --- PRODUCT API ROUTES ---
+// Other product routes remain the same...
 app.get('/api/products', async (req, res) => {
     try {
         const { page = 1, limit = 8, search = '', category = 'All', sort = 'newest', minPrice, maxPrice } = req.query;
@@ -153,7 +117,6 @@ app.get('/api/products', async (req, res) => {
         res.json({ products, totalPages, currentPage: parseInt(page) });
     } catch (error) { res.status(500).send('Server error fetching products.'); }
 });
-
 app.get('/api/products/:id', async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
@@ -161,7 +124,6 @@ app.get('/api/products/:id', async (req, res) => {
         res.json(product);
     } catch (error) { res.status(500).send('Server error fetching product details.'); }
 });
-
 app.post('/api/products', upload.single('image'), async (req, res) => {
     try {
         const { name, price, brand, category } = req.body;
@@ -171,7 +133,6 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
         res.status(201).json(newProduct);
     } catch (error) { res.status(500).send('Server error creating product.'); }
 });
-
 app.put('/api/products/:id', upload.single('image'), async (req, res) => {
     try {
         const { name, price, brand, category } = req.body;
@@ -183,7 +144,6 @@ app.put('/api/products/:id', upload.single('image'), async (req, res) => {
         res.json(updatedProduct);
     } catch (error) { res.status(500).send('Server error updating product.'); }
 });
-
 app.delete('/api/products/:id', async (req, res) => {
     try {
         const deletedProduct = await Product.findByIdAndDelete(req.params.id);
@@ -195,8 +155,8 @@ app.delete('/api/products/:id', async (req, res) => {
     } catch (error) { res.status(500).send('Server error deleting product.'); }
 });
 
+
 // --- START SERVER ---
 app.listen(port, () => {
     console.log(`Backend server is running at http://localhost:${port}`);
 });
-
