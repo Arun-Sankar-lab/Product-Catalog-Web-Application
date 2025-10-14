@@ -94,7 +94,7 @@
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
             
-            const API_BASE_URL = 'http://localhost:3000';
+            const API_BASE_URL = 'https://product-catalog-gnut.onrender.com';
 
             try {
                 const response = await fetch(`${API_BASE_URL}/api/signup`, {
