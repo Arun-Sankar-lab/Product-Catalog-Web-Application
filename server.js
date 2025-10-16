@@ -55,14 +55,15 @@ app.post('/api/signup', async (req, res) => {
             return res.status(409).json({ success: false, message: 'User with this email already exists.' });
         }
         
-        // --- MODIFIED LOGIC ---
         // If signing up as admin, validate the secret key from environment variables
         if (role === 'admin') {
-            if (!adminKey || adminKey !== process.env.ADMIN_SECRET_KEY) {
-                return res.status(403).json({ success: false, message: 'Invalid Admin Secret Key.' });
+            // This now does a direct string comparison. No hashing.
+            if (!adminKey || adminKey !== "Aquila123") {
+                return res.status(403).json({ success: false, message: 'Invalid Admin secret Key.' });
             }
         }
         
+        // User passwords are still securely hashed
         const hashedPassword = await bcrypt.hash(password, 10);
         
         const newUser = new User({ email, password: hashedPassword, role });
@@ -86,10 +87,13 @@ app.post('/api/login', async (req, res) => {
         if (!user) {
             return res.status(401).json({ success: false, message: 'Invalid credentials.' });
         }
+
+        // Securely compares the provided password with the stored hash
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ success: false, message: 'Invalid credentials.' });
         }
+
         res.json({ success: true, role: user.role });
     } catch (error) {
         console.error('Login error:', error);
