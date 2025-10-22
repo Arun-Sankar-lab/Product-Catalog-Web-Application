@@ -27,84 +27,84 @@
 
 **Technology Stack**
 
-Frontend: React.js (via CDN), HTML5, CSS3
-
-Backend: Node.js, Express.js
-
-Database: MongoDB (with Mongoose ODM)
-
-Authentication: bcrypt for password hashing
-
-File Uploads: multer for handling image uploads
+        Frontend: React.js (via CDN), HTML5, CSS3
+        
+        Backend: Node.js, Express.js
+        
+        Database: MongoDB (with Mongoose ODM)
+        
+        Authentication: bcrypt for password hashing
+        
+        File Uploads: multer for handling image uploads
 
 **Local Setup Guide**
 
-Follow these steps to run the project on your local machine.
-
-Prerequisites
-
-Node.js (v18 or later recommended)
-
-npm (usually comes with Node.js)
-
-MongoDB installed locally OR a MongoDB Atlas account
-
-Installation & Setup
-
-Clone the Repository:
-
-git clone [Your GitHub Repository URL]
-cd [Your Repository Folder Name] 
-
-
-Install Backend Dependencies:
-Navigate to the project's root directory (where server.js is located) and run:
-
-npm install
-
-
-Set Up Environment Variables:
-
-Create a file named .env in the project root directory.
-
-Add the following lines, replacing the placeholder values:
-
-# Your MongoDB connection string (local or Atlas)
-MONGO_URI=mongodb://127.0.0.1:27017/productCatalogDB 
-# MONGO_URI=mongodb+srv://<user>:<password>@<your-atlas-cluster>...
-
-Note: Use your local MongoDB connection string if running MongoDB locally. If using Atlas for local development, use your Atlas connection string.
-
-Seed the Database (Optional but Recommended):
-Run the following command in the root directory to populate your database with sample products and create the necessary collections:
-
-node seed.js
-
-
-(Make sure your MongoDB server is running locally or that your .env file points to Atlas before running this).
-
-Create Uploads Directory:
-Manually create a folder named uploads in the project root directory. This is where uploaded images will be stored locally.
-
-Start the Backend Server:
-
-node server.js
-
-
-The server should start, and you'll see "Successfully connected to MongoDB!" in the console. It will typically run on http://localhost:3000.
-
-Access the Frontend:
-
-Open your web browser.
-
-Navigate to the signup.html file within the project folder ([Your Repository Folder Name]/client/public/signup.html). You can usually do this by dragging the file into your browser or using a simple local server if you have one (like VS Code's Live Server extension pointing to the client/public directory).
-
-Alternatively, if the backend is running, you might be able to access it via http://localhost:3000/signup.html because the server is also serving static files.
+        Follow these steps to run the project on your local machine.
+        
+        Prerequisites
+        
+        Node.js (v18 or later recommended)
+        
+        npm (usually comes with Node.js)
+        
+        MongoDB installed locally OR a MongoDB Atlas account
+        
+        Installation & Setup
+        
+        Clone the Repository:
+        
+        git clone [Your GitHub Repository URL]
+        cd [Your Repository Folder Name] 
+        
+        
+        Install Backend Dependencies:
+        Navigate to the project's root directory (where server.js is located) and run:
+        
+        npm install
+        
+        
+        Set Up Environment Variables:
+        
+        Create a file named .env in the project root directory.
+        
+        Add the following lines, replacing the placeholder values:
+        
+        # Your MongoDB connection string (local or Atlas)
+        MONGO_URI=mongodb://127.0.0.1:27017/productCatalogDB 
+        # MONGO_URI=mongodb+srv://<user>:<password>@<your-atlas-cluster>...
+        
+        Note: Use your local MongoDB connection string if running MongoDB locally. If using Atlas for local development, use your Atlas connection string.
+        
+        Seed the Database (Optional but Recommended):
+        Run the following command in the root directory to populate your database with sample products and create the necessary collections:
+        
+        node seed.js
+        
+        
+        (Make sure your MongoDB server is running locally or that your .env file points to Atlas before running this).
+        
+        Create Uploads Directory:
+        Manually create a folder named uploads in the project root directory. This is where uploaded images will be stored locally.
+        
+        Start the Backend Server:
+        
+        node server.js
+        
+        
+        The server should start, and you'll see "Successfully connected to MongoDB!" in the console. It will typically run on http://localhost:3000.
+        
+        Access the Frontend:
+        
+        Open your web browser.
+        
+        Navigate to the signup.html file within the project folder ([Your Repository Folder Name]/client/public/signup.html). You can usually do this by dragging the file into your browser or using a simple local server if you have one (like VS Code's Live Server extension pointing to the client/public directory).
+        
+        Alternatively, if the backend is running, you might be able to access it via http://localhost:3000/signup.html because the server is also serving static files.
 
 **Creating Users**
 
-Use the signup page to create your first user. Select the "Admin" role and enter the ADMIN_SECRET_KEY from your .env file (SuperSecretAdminKey123!).
-
-Create subsequent users by selecting the "User" role (no key needed).
-
-(Note: The free Render backend instance may take 30-60 seconds to "wake up" on the first request after a period of inactivity.)
+        Use the signup page to create your first user. Select the "Admin" role and enter the ADMIN_SECRET_KEY from your .env file (SuperSecretAdminKey123!).
+        
+        Create subsequent users by selecting the "User" role (no key needed).
+        
+        (Note: The free Render backend instance may take 30-60 seconds to "wake up" on the first request after a period of inactivity.)
